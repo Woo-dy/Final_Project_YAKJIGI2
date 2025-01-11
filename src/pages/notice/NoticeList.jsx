@@ -50,6 +50,7 @@ function NoticeList(props) {
    const handleNextPage = () =>
       setCurrentPage((prev) => Math.min(prev + 1, totalPages));
    const handleLastPage = () => setCurrentPage(totalPages);
+   
 
    // 체크된 공지 데이터// 체크된 공지 데이터
    const checkedNotices = notices.filter((notice) => notice.notice_check);
@@ -61,6 +62,14 @@ function NoticeList(props) {
       (currentPage - 1) * itemsPerPage,
       currentPage * itemsPerPage
    );
+
+   const getPageRange = (currentPage, totalPages) => {
+      const maxButtons = 5; // 최대 버튼 개수
+      const startPage = Math.max(1, Math.min(currentPage - Math.floor(maxButtons / 2), totalPages - maxButtons + 1));
+      const endPage = Math.min(startPage + maxButtons - 1, totalPages);
+      return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+   };
+   
 
    const noticeDetailBtn = (noticeId) => {
       window.location.href = `/noticedetail/${noticeId}`;
@@ -152,8 +161,6 @@ function NoticeList(props) {
                         </li>
                      </ul>
                   </div>
-                  
-                  
 
                   {/* paging 영역 start */}
                   <div>
@@ -174,17 +181,15 @@ function NoticeList(props) {
                         >
                            chevron_left
                         </li>
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                           (page) => (
-                              <li
-                                 key={page}
-                                 className={`${page === currentPage ? commons.active : ""}`}
-                                 onClick={() => setCurrentPage(page)}
-                              >
-                                 {page}
-                              </li>
-                           )
-                        )}
+                        {getPageRange(currentPage, totalPages).map((page) => (
+                           <li
+                              key={page}
+                              className={`${page === currentPage ? commons.active : ""}`}
+                              onClick={() => setCurrentPage(page)}
+                           >
+                              {page}
+                           </li>
+                        ))}
                         <li
                            className={`material-icons next ${
                               currentPage === totalPages ? commons.disabled : ""

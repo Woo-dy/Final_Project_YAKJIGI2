@@ -1,48 +1,57 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import commons from '../../styles/common.module.css';
 import styles from '../../styles/faq/faq.module.css';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
+import axios from 'axios';
 
 function FaqList(props) {
    const { mainTitle, subTitle } = useDocumentTitle();
 
-   const faqData = [
-   {
-      question: "도심 공원의 이용시간은  어떻게 되나요?",
-      answer: "일반 도심공원은 24시간 개방, 시설형 도심공원은 오전 6시부터 밤 10시까지 운영됩니다. 일반 도심공원은 24시간 개방, 시설형 도심공원은 오전 6시부터 밤 10시까지 운영됩니다. 일반 도심공원은 24시간 개방, 시설형 도심공원은 오전 6시부터 밤 10시까지 운영됩니다. 일반 도심공원은 24시간 개방, 시설형 도심공원은 오전 6시부터 밤 10시까지 운영됩니다. 일반 도심공원은 24시간 개방, 시설형 도심공원은 오전 6시부터 밤 10시까지 운영됩니다. 일반 도심공원은 24시간 개방, 시설형 도심공원은 오전 6시부터 밤 10시까지 운영됩니다. 일반 도심공원은 24시간 개방, 시설형 도심공원은 오전 6시부터 밤 10시까지 운영됩니다. 일반 도심공원은 24시간 개방, 시설형 도심공원은 오전 6시부터 밤 10시까지 운영됩니다. 일반 도심공원은 24시간 개방, 시설형 도심공원은 오전 6시부터 밤 10시까지 운영됩니다."
-   },
-   {
-      question: "공원 부대시설의 불편사항은 어디에 신고하나요?",
-      answer: "일반 도심공원은 24시간 개방"
-   },
-   {
-      question: "가로수길의 위생관련 신고는 어디에 하나요?",
-      answer: "일반 도심공원은 24시간 개방"
-   },
-   {
-      question: "도심 공원의 이용시간은  어떻게 되나요?",
-      answer: "일반 도심공원은 24시간 개방"
-   },
-   {
-      question: "가로수길에서 발견된 보행 불편물은 개인이 처리해도 되나요?",
-      answer: "일반 도심공원은 24시간 개방"
-   },
-   {
-      question: "보호수 신청은 어떻게 하나요?",
-      answer: "일반 도심공원은 24시간 개방"
-   },
-   ];
+   const [faqData, setFaqData] = useState([]);
+   const [currentPage, setCurrentPage] = useState(1);
+   const itemsPerPage = 10;
+   const API_URL = `${process.env.REACT_APP_LOCAL_API_BASE_URL}/fnatbl/list`;
 
-   const [activeIndex, setActiveIndex] = useState(0);
+   useEffect(() => {
+      const fetchFaqData = async () => {
+         try {
+            const response = await axios.get(API_URL);
+            if (response.data.success && response.data.data) {
+               setFaqData(response.data.data);
+            } else {
+               console.error('Invalid API response structure:', response.data);
+            }
+         } catch (error) {
+            console.error('Error fetching FAQ data:', error);
+         }
+      };
+
+      fetchFaqData();
+   }, [API_URL]);
+
+   const totalPages = Math.ceil(faqData.length / itemsPerPage);
+   const paginatedData = faqData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+   const [activeIndex, setActiveIndex] = useState(0); // 첫 번째 항목 활성화
 
    const toggleAnswer = (index) => {
-   if (activeIndex === index) {
-      setActiveIndex(null);
-   } else {
-      setActiveIndex(index);
-   }
+      setActiveIndex(activeIndex === index ? null : index);
    };
+
+   const handleFirstPage = () => setCurrentPage(1);
+   const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
+   const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+   const handleLastPage = () => setCurrentPage(totalPages);
+
+   const getPageRange = () => {
+      const maxButtons = 5; // 최대 버튼 개수
+      const startPage = Math.max(1, Math.min(currentPage - Math.floor(maxButtons / 2), totalPages - maxButtons + 1));
+      const endPage = Math.min(startPage + maxButtons - 1, totalPages);
+      return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+   };
+
+   const pageRange = getPageRange();
 
    return (
       <>
@@ -53,7 +62,7 @@ function FaqList(props) {
          
          <div className={commons.common__boradsearch__container}>   
             <ul className={commons.common__boradsearch__ul}>
-               <li>총 <span>16</span>건</li>
+               <li>총 <span>{faqData.length}</span>건</li>
                <li>
                   <form action="">
                      <div className={commons.common__searchbar__box}>
@@ -67,39 +76,65 @@ function FaqList(props) {
 
          <div className={styles.faq__container}>
             <div className={styles.faq__list}>
-               {faqData.map((item, index) => (
-               <div key={index} className={styles.faq__item}>
-                  <div
-                     className={`${styles.faq__question} ${index === 0 ? styles.firstQuestion : ''}`}
-                     onClick={() => toggleAnswer(index)}
-                  >
-                     {item.question}
-                     <span className={`material-icons ${activeIndex === index ? styles.rotate : ''}`}>
-                     {activeIndex === index ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
-                     </span>
-                  </div>
-
-                  {activeIndex === index && (
-                     <div className={`${styles.faq__answer} ${styles.active}`}>
-                     {item.answer}
+               {paginatedData.map((item, index) => (
+                  <div key={index} className={styles.faq__item}>
+                     <div
+                        className={`${styles.faq__question} ${index === 0 ? styles.firstQuestion : ''}`}
+                        onClick={() => toggleAnswer(index)}
+                     >
+                        {item.fna_question}
+                        <span className={`material-icons ${activeIndex === index ? styles.rotate : ''}`}>
+                           {activeIndex === index ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
+                        </span>
                      </div>
-                  )}
-               </div>
+
+                     {activeIndex === index && (
+                        <div className={`${styles.faq__answer} ${styles.active}`}>
+                           {item.fna_answer}
+                        </div>
+                     )}
+                  </div>
                ))}
             </div>
+
+            
 
             {/* paging 영역 start */}
             <div>
                <ul className={commons.paging_num_ul}>
-                  <li className="material-icons prev">keyboard_double_arrow_left</li>
-                  <li className="material-icons prev">chevron_left</li>
-                  <li className={commons.active}>1</li>
-                  <li>2</li>
-                  <li>3</li>
-                  <li>4</li>
-                  <li>5</li>
-                  <li className="material-icons next">chevron_right</li>
-                  <li className="material-icons next">keyboard_double_arrow_right</li>
+                  <li 
+                     className={`material-icons prev ${currentPage === 1 ? commons.disabled : ''}`} 
+                     onClick={currentPage > 1 ? handleFirstPage : null}
+                  >
+                     keyboard_double_arrow_left
+                  </li>
+                  <li 
+                     className={`material-icons prev ${currentPage === 1 ? commons.disabled : ''}`} 
+                     onClick={currentPage > 1 ? handlePrevPage : null}
+                  >
+                     chevron_left
+                  </li>
+                  {pageRange.map((page) => (
+                     <li 
+                        key={page} 
+                        className={`${currentPage === page ? commons.active : ''}`}
+                        onClick={() => setCurrentPage(page)}
+                     >
+                        {page}
+                     </li>
+                  ))}
+                  <li 
+                     className={`material-icons next ${currentPage === totalPages ? commons.disabled : ''}`} 
+                     onClick={currentPage < totalPages ? handleNextPage : null}
+                  >
+                     chevron_right
+                  </li>
+                  <li 
+                     className={`material-icons next ${currentPage === totalPages ? commons.disabled : ''}`} 
+                     onClick={currentPage < totalPages ? handleLastPage : null}
+                  >
+                     keyboard_double_arrow_right
+                  </li>
                </ul>
             </div>
             {/* paging 영역 end */}
