@@ -69,18 +69,19 @@ function MinquiryList(props) {
 
    // 검색 처리
    const handleSearch = (e) => {
-      const query = e.target.value.toLowerCase();
-      setSearchQuery(query);
+      const query = e.target.value.toLowerCase(); // **추가됨**
+      setSearchQuery(query); // **추가됨**
 
       const filtered = qnaData.filter(
          (item) =>
-            item.qna_title.toLowerCase().includes(query) || // 제목 검색
-            item.qna_status.toLowerCase().includes(query) // 상태 검색
+            item.question_title.toLowerCase().includes(query) || // 제목 검색 **추가됨**
+            (item.counsel_open === 1 && '답변완료'.includes(query)) || // 답변완료 상태 검색 **추가됨**
+            (item.counsel_open === 0 && '답변대기'.includes(query)) // 답변대기 상태 검색 **추가됨**
       );
-      setFilteredData(filtered);
-      setCurrentPage(1); // 검색 시 첫 페이지로 이동
+      setFilteredData(filtered); // 검색 결과 업데이트 **추가됨**
+      setCurrentPage(1); // 검색 시 첫 페이지로 이동 **추가됨**
    };
-   
+
    const minquiryDetailBtn = (idx) => {
       window.location.href = `/minquirydetail/${idx}`;
    };
@@ -91,12 +92,14 @@ function MinquiryList(props) {
    };
 
    if (loading) {
-      return <div className={commons.lodding_page}>
-      <div>
-         <img src="/images/favicon192.png" alt="로고" />
-         <p>로딩 중...</p>
-      </div>
-   </div>;
+      return (
+         <div className={commons.lodding_page}>
+            <div>
+               <img src="/images/favicon192.png" alt="로고" />
+               <p>로딩 중...</p>
+            </div>
+         </div>
+      );
    }
 
    return (
@@ -117,7 +120,7 @@ function MinquiryList(props) {
                            className={commons.common__search__input}
                            placeholder="검색어를 입력해주세요"
                            value={searchQuery}
-                           onChange={handleSearch}
+                           onChange={handleSearch} // **추가됨**
                         />
                         <span className="material-icons">search</span>
                      </div>

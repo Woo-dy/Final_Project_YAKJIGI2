@@ -1,6 +1,3 @@
-import { Autoplay, Navigation, Pagination } from 'swiper/modules';
-import { Swiper, SwiperSlide } from 'swiper/react';
-
 import commons from '../../styles/common.module.css';
 import board from '../../styles/boardcommon.module.css';
 import styles from '../../styles/qna/qnalist.module.css';
@@ -78,11 +75,12 @@ function QnaList(props) {
       const filtered = qnaData.filter(
          (item) =>
             item.qna_title.toLowerCase().includes(query) || // 제목 검색
-            item.qna_status.toLowerCase().includes(query) // 상태 검색
+            (item.qna_answer_stat === 1 && '답변완료'.includes(query)) || // 답변완료 상태 검색
+            (item.qna_answer_stat === 0 && '답변대기'.includes(query)) // 답변대기 상태 검색
       );
-      setFilteredData(filtered);
+      setFilteredData(filtered); // 검색 결과 업데이트
       setCurrentPage(1); // 검색 시 첫 페이지로 이동
-   };
+   }; // **추가됨**
 
    const qnaDetailBtn = (idx) => {
       window.location.href = `/qnadetail/${idx}`;
@@ -94,12 +92,14 @@ function QnaList(props) {
    };
 
    if (loading) {
-      return <div className={commons.lodding_page}>
-      <div>
-         <img src="/images/favicon192.png" alt="로고" />
-         <p>로딩 중...</p>
-      </div>
-   </div>;
+      return (
+         <div className={commons.lodding_page}>
+            <div>
+               <img src="/images/favicon192.png" alt="로고" />
+               <p>로딩 중...</p>
+            </div>
+         </div>
+      );
    }
 
    return (
@@ -110,184 +110,6 @@ function QnaList(props) {
          </div>
 
          <div className={styles.qnalist__container__box}>
-            <p className={styles.qnalist__contents__title}>약지기에 도움을 주시는 전문가 분들을 소개합니다.</p>
-
-            <div className={styles.qnalist__container__profile}>
-               <Swiper Autoplay
-                  modules={[Autoplay, Pagination, Navigation]} // 사용하는 모듈
-                  className={styles.swiperbg}
-                  autoplay={{
-                        delay: 3000, // 3초마다 슬라이드 변경
-                        disableOnInteraction: false, // 사용자 조작 시 자동 재생 유지
-                  }}
-                  loop={true} // 무한 반복 추가src/pages/main/SwiperSlider.jsx
-                  spaceBetween={30} // 슬라이드 간 간격
-                  slidesPerView={6} // 한 화면에 보여줄 슬라이드 갯수
-                  navigation={{
-                     nextEl: `.${styles.next}`,
-                     prevEl: `.${styles.prev}`,
-                  }} // 네비게이션 화살표 추가
-                  breakpoints={{ 
-                     360: { slidesPerView: 1, spaceBetween: 30 },
-                     480: { slidesPerView: 2, spaceBetween: 30 },
-                     768: { slidesPerView: 3, spaceBetween: 30 },
-                     1200: { slidesPerView: 6, spaceBetween: 30 },
-                  }} // 반응형
-               >
-                  <SwiperSlide className={styles.qnalist__profile__box}>
-                        <img src="/images/qnalist/medical_staff01.jpg"
-                        alt="이미지" 
-                        className={styles.qnalist__profile__image} />
-                        <div className={styles.profile__text__box}>
-                           <ul>
-                              <li>
-                                 <p>고영희</p>
-                                 <em>의사</em>
-                              </li>
-                              <li>
-                                 <div className={styles.qnalist__profile__logo__box}>
-                                    <span class="material-symbols-outlined">stethoscope</span>
-                                 </div>
-                              </li>
-                           </ul>
-                        </div>
-                  </SwiperSlide>
-                  <SwiperSlide className={styles.qnalist__profile__box}>
-                        <img src="/images/qnalist/medical_staff02.jpg"
-                        alt="이미지" 
-                        className={styles.qnalist__profile__image} />
-                        <div className={styles.profile__text__box}>
-                           <ul>
-                              <li>
-                                 <p>고영희</p>
-                                 <em>약사</em>
-                              </li>
-                              <li>
-                                 <div className={styles.qnalist__profile__logo__box}>
-                                    <span class="material-symbols-outlined">medication</span>
-                                 </div>
-                              </li>
-                           </ul>
-                        </div>
-                  </SwiperSlide>
-                  <SwiperSlide className={styles.qnalist__profile__box}>
-                        <img src="/images/qnalist/medical_staff03.jpg"
-                        alt="이미지" 
-                        className={styles.qnalist__profile__image} />
-                        <div className={styles.profile__text__box}>
-                           <ul>
-                              <li>
-                                 <p>고영희</p>
-                                 <em>의사</em>
-                              </li>
-                              <li>
-                                 <div className={styles.qnalist__profile__logo__box}>
-                                    <span class="material-symbols-outlined">stethoscope</span>
-                                 </div>
-                              </li>
-                           </ul>
-                        </div>
-                  </SwiperSlide>
-                  <SwiperSlide className={styles.qnalist__profile__box}>
-                        <img src="/images/qnalist/medical_staff04.jpg"
-                        alt="이미지" 
-                        className={styles.qnalist__profile__image} />
-                        <div className={styles.profile__text__box}>
-                           <ul>
-                              <li>
-                                 <p>고영희</p>
-                                 <em>약사</em>
-                              </li>
-                              <li>
-                                 <div className={styles.qnalist__profile__logo__box}>
-                                    <span class="material-symbols-outlined">medication</span>
-                                 </div>
-                              </li>
-                           </ul>
-                        </div>
-                  </SwiperSlide>
-                  <SwiperSlide className={styles.qnalist__profile__box}>
-                        <img src="/images/qnalist/medical_staff05.jpg"
-                        alt="이미지" 
-                        className={styles.qnalist__profile__image} />
-                        <div className={styles.profile__text__box}>
-                           <ul>
-                              <li>
-                                 <p>고영희</p>
-                                 <em>약사</em>
-                              </li>
-                              <li>
-                                 <div className={styles.qnalist__profile__logo__box}>
-                                    <span class="material-symbols-outlined">medication</span>
-                                 </div>
-                              </li>
-                           </ul>
-                        </div>
-                  </SwiperSlide>
-                  <SwiperSlide className={styles.qnalist__profile__box}>
-                        <img src="/images/qnalist/medical_staff06.jpg"
-                        alt="이미지" 
-                        className={styles.qnalist__profile__image} />
-                        <div className={styles.profile__text__box}>
-                           <ul>
-                              <li>
-                                 <p>고영희</p>
-                                 <em>약사</em>
-                              </li>
-                              <li>
-                                 <div className={styles.qnalist__profile__logo__box}>
-                                    <span class="material-symbols-outlined">medication</span>
-                                 </div>
-                              </li>
-                           </ul>
-                        </div>
-                  </SwiperSlide>
-                  <SwiperSlide className={styles.qnalist__profile__box}>
-                        <img src="/images/qnalist/medical_staff07.jpg"
-                        alt="이미지" 
-                        className={styles.qnalist__profile__image} />
-                        <div className={styles.profile__text__box}>
-                           <ul>
-                              <li>
-                                 <p>고영희</p>
-                                 <em>약사</em>
-                              </li>
-                              <li>
-                                 <div className={styles.qnalist__profile__logo__box}>
-                                    <span class="material-symbols-outlined">medication</span>
-                                 </div>
-                              </li>
-                           </ul>
-                        </div>
-                  </SwiperSlide>
-                  <SwiperSlide className={styles.qnalist__profile__box}>
-                        <img src="/images/qnalist/medical_staff08.jpg"
-                        alt="이미지" 
-                        className={styles.qnalist__profile__image} />
-                        <div className={styles.profile__text__box}>
-                           <ul>
-                              <li>
-                                 <p>고영희</p>
-                                 <em>의사</em>
-                              </li>
-                              <li>
-                                 <div className={styles.qnalist__profile__logo__box}>
-                                    <span class="material-symbols-outlined">stethoscope</span>
-                                 </div>
-                              </li>
-                           </ul>
-                        </div>
-                  </SwiperSlide>
-               {/* 사용자 정의 버튼 (넘기는 버튼) */}
-               <div className={styles.prev}>
-                  <div className="material-icons">arrow_back</div>
-               </div>
-               <div className={styles.next}>
-                  <div className="material-icons">arrow_forward</div>
-               </div>
-               </Swiper>
-            </div>
-            
          
             <div className={commons.common__boradsearch__container}>   
                <ul className={commons.common__boradsearch__ul}>
@@ -298,7 +120,7 @@ function QnaList(props) {
                            <input 
                               type="text"
                               value={searchQuery}
-                              onChange={handleSearch}
+                              onChange={handleSearch} // **추가됨**
                               className={commons.common__search__input}
                               placeholder="검색어를 입력해주세요"
                            />

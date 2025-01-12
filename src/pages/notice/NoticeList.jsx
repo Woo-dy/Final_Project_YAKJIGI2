@@ -10,20 +10,21 @@ import axios from 'axios';
 
 function NoticeList(props) {
    const { mainTitle, subTitle } = useDocumentTitle();
-   const [notices, setNotices] = useState([]);
+   const [notices, setNotices] = useState([]); // 전체 공지 데이터
+   const [filteredNotices, setFilteredNotices] = useState([]); // 검색 결과 데이터 **추가됨**
+   const [searchQuery, setSearchQuery] = useState(''); // 검색어 상태 **추가됨**
    const [loading, setLoading] = useState(true);
    const [currentPage, setCurrentPage] = useState(1);
-   const [itemsPerPage] = useState(10);
+   const itemsPerPage = 10;
    const API_URL = `${process.env.REACT_APP_LOCAL_API_BASE_URL}/noticetbl/list`;
 
    // 전체 공지의 총 페이지 수
-   const totalPages = Math.ceil(notices.length / itemsPerPage);
+   const totalPages = Math.ceil(filteredNotices.length / itemsPerPage); // **수정됨**
 
    useEffect(() => {
       const fetchNotices = async () => {
          try {
             const response = await axios.get(API_URL);
-   
             if (response.data.success && response.data.data) {
                const sortedData = response.data.data.sort((a, b) => {
                   if (a.notice_check !== b.notice_check) {
@@ -32,6 +33,7 @@ function NoticeList(props) {
                   return new Date(b.notice_reg_date) - new Date(a.notice_reg_date); // 날짜 기준 정렬
                });
                setNotices(sortedData);
+               setFilteredNotices(sortedData); // 초기 검색 결과는 전체 데이터 **추가됨**
             } else {
                console.error('Invalid API response structure:', response.data);
             }
@@ -41,7 +43,7 @@ function NoticeList(props) {
             setLoading(false);
          }
       };
-   
+
       fetchNotices();
    }, [API_URL]);
 
@@ -50,12 +52,20 @@ function NoticeList(props) {
    const handleNextPage = () =>
       setCurrentPage((prev) => Math.min(prev + 1, totalPages));
    const handleLastPage = () => setCurrentPage(totalPages);
-   
 
-   // 체크된 공지 데이터// 체크된 공지 데이터
-   const checkedNotices = notices.filter((notice) => notice.notice_check);
-   const uncheckedNotices = notices.filter((notice) => !notice.notice_check);
+   const getPageRange = (currentPage, totalPages) => {
+      const maxButtons = 5; // 최대 버튼 개수
+      const startPage = Math.max(
+         1,
+         Math.min(currentPage - Math.floor(maxButtons / 2), totalPages - maxButtons + 1)
+      );
+      const endPage = Math.min(startPage + maxButtons - 1, totalPages);
+      return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+   };
 
+   // 체크된 공지 데이터
+   const checkedNotices = filteredNotices.filter((notice) => notice.notice_check); // **수정됨**
+   const uncheckedNotices = filteredNotices.filter((notice) => !notice.notice_check); // **수정됨**
 
    // 현재 페이지의 데이터에서 체크되지 않은 공지만 포함
    const paginatedData = uncheckedNotices.slice(
@@ -63,13 +73,19 @@ function NoticeList(props) {
       currentPage * itemsPerPage
    );
 
-   const getPageRange = (currentPage, totalPages) => {
-      const maxButtons = 5; // 최대 버튼 개수
-      const startPage = Math.max(1, Math.min(currentPage - Math.floor(maxButtons / 2), totalPages - maxButtons + 1));
-      const endPage = Math.min(startPage + maxButtons - 1, totalPages);
-      return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+   // 검색 처리 **추가됨**
+   const handleSearch = (e) => {
+      const query = e.target.value.toLowerCase();
+      setSearchQuery(query);
+
+      const filtered = notices.filter(
+         (notice) =>
+            notice.notice_title.toLowerCase().includes(query) || // 제목에서 검색
+            new Date(notice.notice_reg_date).toLocaleDateString().includes(query) // 날짜에서 검색
+      );
+      setFilteredNotices(filtered);
+      setCurrentPage(1); // 검색 시 첫 페이지로 이동
    };
-   
 
    const noticeDetailBtn = (noticeId) => {
       window.location.href = `/noticedetail/${noticeId}`;
@@ -80,12 +96,14 @@ function NoticeList(props) {
    };
 
    if (loading) {
-      return <div className={commons.lodding_page}>
-      <div>
-         <img src="/images/favicon192.png" alt="로고" />
-         <p>로딩 중...</p>
-      </div>
-   </div>;
+      return (
+         <div className={commons.lodding_page}>
+            <div>
+               <img src="/images/favicon192.png" alt="로고" />
+               <p>로딩 중...</p>
+            </div>
+         </div>
+      );
    }
 
    return (
@@ -98,11 +116,17 @@ function NoticeList(props) {
          
          <div className={commons.common__boradsearch__container}>   
             <ul className={commons.common__boradsearch__ul}>
-               <li>총 <span>{notices.length}</span>건</li>
+               <li>총 <span>{filteredNotices.length}</span>건</li> {/* **수정됨** */}
                <li>
-                  <form action="">
+                  <form>
                      <div className={commons.common__searchbar__box}>
-                        <input type="text" className={commons.common__search__input} placeholder="검색어를 입력해주세요" />
+                        <input
+                           type="text"
+                           value={searchQuery} // **추가됨**
+                           onChange={handleSearch} // **추가됨**
+                           className={commons.common__search__input}
+                           placeholder="검색어를 입력해주세요"
+                        />
                         <span className="material-icons">search</span>
                      </div>
                   </form>
@@ -166,18 +190,14 @@ function NoticeList(props) {
                   <div>
                      <ul className={commons.paging_num_ul}>
                         <li
-                           className={`material-icons prev ${
-                              currentPage === 1 ? commons.disabled : ""
-                           }`}
-                           onClick={currentPage === 1 ? null : handleFirstPage}
+                           className={`material-icons prev ${currentPage === 1 ? commons.disabled : ""}`}
+                           onClick={currentPage > 1 ? handleFirstPage : null}
                         >
                            keyboard_double_arrow_left
                         </li>
                         <li
-                           className={`material-icons prev ${
-                              currentPage === 1 ? commons.disabled : ""
-                           }`}
-                           onClick={currentPage === 1 ? null : handlePrevPage}
+                           className={`material-icons prev ${currentPage === 1 ? commons.disabled : ""}`}
+                           onClick={currentPage > 1 ? handlePrevPage : null}
                         >
                            chevron_left
                         </li>
@@ -191,18 +211,14 @@ function NoticeList(props) {
                            </li>
                         ))}
                         <li
-                           className={`material-icons next ${
-                              currentPage === totalPages ? commons.disabled : ""
-                           }`}
-                           onClick={currentPage === totalPages ? null : handleNextPage}
+                           className={`material-icons next ${currentPage === totalPages ? commons.disabled : ""}`}
+                           onClick={currentPage < totalPages ? handleNextPage : null}
                         >
                            chevron_right
                         </li>
                         <li
-                           className={`material-icons next ${
-                              currentPage === totalPages ? commons.disabled : ""
-                           }`}
-                           onClick={currentPage === totalPages ? null : handleLastPage}
+                           className={`material-icons next ${currentPage === totalPages ? commons.disabled : ""}`}
+                           onClick={currentPage < totalPages ? handleLastPage : null}
                         >
                            keyboard_double_arrow_right
                         </li>

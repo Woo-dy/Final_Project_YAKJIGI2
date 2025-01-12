@@ -107,6 +107,23 @@ function App() {
       };
    }, []);
 
+   useEffect(() => {
+      const script = document.createElement("script");
+      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.REACT_APP_KAKAO_MAP}&autoload=false&libraries=services,clusterer`;
+      script.async = true;
+      document.head.appendChild(script);
+
+      script.onload = () => {
+         window.kakao.maps.load(() => {
+            console.log("Kakao Maps API 로드 완료");
+         });
+      };
+
+      return () => {
+         document.head.removeChild(script);
+      };
+   }, []);
+
    return (
       <BrowserRouter>
          <div className='App'>

@@ -210,14 +210,17 @@ ul.sub_search_container li.sub_search .sub_search_div input:focus {
 
 .status_table thead tr th:nth-child(1) {
    width: 300px;
+   text-align: center;
 }
 
 .status_table thead tr th:nth-child(2) {
    width: calc(100% - 600px);
+   text-align: center;
 }
 
 .status_table thead tr th:nth-child(3) {
    width: 300px;
+   text-align: center;
 }
 
 .status_table tbody tr {
@@ -246,6 +249,7 @@ ul.sub_search_container li.sub_search .sub_search_div input:focus {
 
 .status_table tbody tr td:nth-child(1) {
    width: 130px;
+   text-align: center;
 }
 
 .status_table tbody tr td:nth-child(2) {
@@ -261,6 +265,7 @@ ul.sub_search_container li.sub_search .sub_search_div input:focus {
 
 .status_table tbody tr td:nth-child(3) {
    width: 300px;
+   text-align: center;
 }
 
 .result_bar {

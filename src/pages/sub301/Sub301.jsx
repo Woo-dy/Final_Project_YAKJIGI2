@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import commons from '../../styles/common.module.css';
 import styles from '../../styles/sub301/sub301.module.css';
@@ -7,6 +7,71 @@ import useDocumentTitle from '../../hooks/useDocumentTitle';
 
 function Sub301(props) {
    const { mainTitle, subTitle } = useDocumentTitle();
+   const [data, setData] = useState([]); // 데이터를 저장할 상태
+   const [searchKeyword, setSearchKeyword] = useState(''); // 검색 키워드 상태
+   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 상태
+   const resultsPerPage = 10; // 한 페이지당 보여줄 결과 수
+
+   // JSON 데이터를 불러오는 함수
+   useEffect(() => {
+      fetch('/data/filtered_sub301.json') // public 폴더를 기준으로 경로 설정
+         .then((response) => {
+            if (!response.ok) {
+               throw new Error('Network response was not ok');
+            }
+            return response.json();
+         })
+         .then((data) => setData(data))
+         .catch((error) => console.error('Error fetching data:', error));
+   }, []);
+
+   // 검색된 결과 필터링
+   const filteredData = data
+      .filter((item) =>
+         searchKeyword
+            ? item.phar_address && item.phar_address.includes(searchKeyword) // null 체크 추가
+            : true // 검색어가 없을 경우 모두 표시
+      )
+      .sort((a, b) => a.phar_name.localeCompare(b.phar_name)); // 가나다순 정렬
+
+   // 검색어가 없을 경우 최대 50개의 데이터만 표시
+   const limitedData = searchKeyword ? filteredData : filteredData.slice(0, 50);
+
+   // 현재 페이지에 해당하는 데이터만 추출
+   const paginatedData = limitedData.slice(
+      (currentPage - 1) * resultsPerPage,
+      currentPage * resultsPerPage
+   );
+
+   // 총 페이지 수 계산 (limitedData 길이에 따라 계산)
+   const totalPages = Math.ceil(limitedData.length / resultsPerPage);
+
+
+   // 페이지 변경 함수
+   const handlePageChange = (pageNumber) => {
+      if (pageNumber < 1 || pageNumber > totalPages) return;
+      setCurrentPage(pageNumber);
+   };
+   
+   // 페이지 번호 배열 생성 (최대 5개씩 표시)
+   const getPageNumbers = () => {
+      const maxPageButtons = 5; // 최대 표시할 페이지 번호 수
+      const halfRange = Math.floor(maxPageButtons / 2);
+
+      let startPage = Math.max(1, currentPage - halfRange);
+      let endPage = Math.min(totalPages, currentPage + halfRange);
+
+      // 현재 페이지가 시작 또는 끝에 가까울 때 범위 조정
+      if (currentPage <= halfRange) {
+         endPage = Math.min(totalPages, maxPageButtons);
+      } else if (currentPage + halfRange >= totalPages) {
+         startPage = Math.max(1, totalPages - maxPageButtons + 1);
+      }
+
+      return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+   };
+
+   const pageNumbers = getPageNumbers(); // 표시할 페이지 번호 배열
 
    return (
       <>
@@ -16,14 +81,27 @@ function Sub301(props) {
          </div>
          
          {/* 검색바 */}
+         
+
+         {/* 검색바 */}
          <ul className={commons.common_search_container}>
             <li>
                <p>초성 검색</p>
-                  
                <div className={commons.common_search_div}>
-                  <form name="" action="/">
-                     <input type="text" name="" id="" placeholder='지역명을 입력하세요 (예시 : 동대문, 일산)' />
-                     <button className="material-icons">search</button>
+                  <form
+                     onSubmit={(e) => {
+                        e.preventDefault(); // 폼 제출 기본 동작 막기
+                     }}
+                  >
+                     <input
+                        type="text"
+                        placeholder="지역명을 입력하세요 (예시 : 동대문, 일산)"
+                        value={searchKeyword}
+                        onChange={(e) => setSearchKeyword(e.target.value)} // 검색 키워드 업데이트
+                     />
+                     <button type="submit" className="material-icons">
+                        search
+                     </button>
                   </form>
                </div>
             </li>
@@ -31,119 +109,79 @@ function Sub301(props) {
          <div className={styles.sub_container2}>
             <ul className={styles.contents_box}>
                <li className={styles.textcenter}>
-                  {/* 검색바 */}
                   <div>
                      <ul className={styles.result_bar}>
-                        <li>총 <span>236</span>개의 결과가 있습니다.</li>
+                        <li>
+                           총 <span>{filteredData.length}</span>개의 결과가 있습니다.
+                        </li>
                      </ul>
                   </div>
 
                   <div className={styles.table_guide}>
-                     <div className={styles.guide}>
-                        좌우로 드래그 해주세요.
-                     </div>
+                     <div className={styles.guide}>좌우로 드래그 해주세요.</div>
                   </div>
 
                   <div className={styles.table}>
                      <table className={styles.status_table}>
-                           <thead>
+                        <thead>
                            <tr>
                               <th>약국명</th>
                               <th>주소</th>
-                              <th>연락처</th>
+                              <th>우편번호</th>
                            </tr>
-                           </thead>
-                           <tbody>
-                           <tr>
-                              <td>1번약국</td>
-                              <td>
-                                 <p>서울특별시 서울 구로구 구로동로 132 (구로동) 1층 (1번약국)</p>
-                              </td>
-                              <td>02-851-1155</td>
-                           </tr>
-                              <tr>
-                              <td>2번약국</td>
-                              <td>
-                                 <p>2번약국 주소</p>
-                              </td>
-                              <td>02-851-1155</td>
-                           </tr>
-                           <tr>
-                              <td>3번약국</td>
-                              <td>
-                                 <p>3번약국 주소</p>
-                              </td>
-                              <td>02-851-1155</td>
-                           </tr>
-                           <tr>
-                              <td>4번약국</td>
-                              <td>
-                                 <p>4번약국 주소</p>
-                              </td>
-                              <td>02-851-1155</td>
-                           </tr>
-                           <tr>
-                              <td>5번약국</td>
-                              <td>
-                                 <p>5번약국 주소</p>
-                              </td>
-                              <td>02-851-1155</td>
-                           </tr>
-                           <tr>
-                              <td>6번약국</td>
-                              <td>
-                                 <p>6번약국 주소</p>
-                              </td>
-                              <td>02-851-1155</td>
-                           </tr>
-                           <tr>
-                              <td>7번약국</td>
-                              <td>
-                                 <p>7번약국 주소</p>
-                              </td>
-                              <td>02-851-1155</td>
-                           </tr>
-                           <tr>
-                              <td>8번약국</td>
-                              <td>
-                                 <p>8번약국 주소</p>
-                              </td>
-                              <td>02-851-1155</td>
-                           </tr>
-                           <tr>
-                              <td>9번약국</td>
-                              <td>
-                                 <p>9번약국 주소</p>
-                              </td>
-                              <td>02-851-1155</td>
-                           </tr>
-                           <tr>
-                              <td>10번약국</td>
-                              <td>
-                                 <p>10번약국 주소</p>
-                              </td>
-                              <td>02-851-1155</td>
-                           </tr>
+                        </thead>
+                        <tbody>
+                           {paginatedData.map((item, index) => (
+                              <tr key={index}>
+                                 <td>{item.phar_name}</td>
+                                 <td>
+                                    <p>{item.phar_address}</p>
+                                 </td>
+                                 <td>{item.phar_address_num}</td>
+                              </tr>
+                           ))}
                         </tbody>
                      </table>
                   </div>
 
-                  {/* paging 영역 start */}
+                  {/* 페이징 영역 */}
                   <div>
                      <ul className={commons.paging_num_ul}>
-                        <li className="material-icons prev">keyboard_double_arrow_left</li>
-                        <li className="material-icons prev">chevron_left</li>
-                        <li className={commons.active}>1</li>
-                        <li>2</li>
-                        <li>3</li>
-                        <li>4</li>
-                        <li>5</li>
-                        <li className="material-icons next">chevron_right</li>
-                        <li className="material-icons next">keyboard_double_arrow_right</li>
+                        <li
+                           className={`material-icons prev ${currentPage === 1 ? commons.disabled : ''}`}
+                           onClick={() => handlePageChange(1)}
+                        >
+                           keyboard_double_arrow_left
+                        </li>
+                        <li
+                           className={`material-icons prev ${currentPage === 1 ? commons.disabled : ''}`}
+                           onClick={() => handlePageChange(currentPage - 1)}
+                        >
+                           chevron_left
+                        </li>
+                        {pageNumbers.map((number) => (
+                           <li
+                              key={number}
+                              className={currentPage === number ? commons.active : ''}
+                              onClick={() => handlePageChange(number)}
+                           >
+                              {number}
+                           </li>
+                        ))}
+                        <li
+                           className={`material-icons next ${currentPage === totalPages ? commons.disabled : ''}`}
+                           onClick={() => handlePageChange(currentPage + 1)}
+                        >
+                           chevron_right
+                        </li>
+                        <li
+                           className={`material-icons next ${currentPage === totalPages ? commons.disabled : ''}`}
+                           onClick={() => handlePageChange(totalPages)}
+                        >
+                           keyboard_double_arrow_right
+                        </li>
                      </ul>
                   </div>
-                  {/* paging 영역 end */}
-                  
                </li>
             </ul>
          </div>
