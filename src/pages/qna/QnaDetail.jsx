@@ -2,12 +2,12 @@ import React from 'react';
 
 import commons from '../../styles/common.module.css';
 import board from '../../styles/boardcommon.module.css';
-import useDocumentTitle from '../../hooks/useDocumentTitle';
 import { Link } from 'react-router-dom';
+import titleMap from '../../titleMap';
 
 
 function QnaDetail(props) {
-   const { mainTitle, subTitle } = useDocumentTitle();
+   const titleInfo = titleMap['/qnadetail/:id']; // 동적 경로에 대한 타이틀 가져오기
 
    const dummyData = Array.from({ length: 60 }, (_, i) => ({
       id: i + 1,
@@ -35,8 +35,8 @@ function QnaDetail(props) {
    return (
       <>
          <div className={commons.container__box__title}>
-            <h2 className={commons.main_title}>{mainTitle}</h2>
-            <p className={commons.sub_title}>{subTitle}</p>
+            <h2 className={commons.main_title}>{titleInfo.mainTitle}</h2>
+            <p className={commons.sub_title}>{titleInfo.subTitle}</p>
          </div>
          <div className={board.board_container}>
             <div className={board.board_content}>

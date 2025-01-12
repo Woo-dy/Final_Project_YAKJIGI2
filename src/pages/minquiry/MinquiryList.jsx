@@ -80,10 +80,9 @@ function MinquiryList(props) {
       setFilteredData(filtered);
       setCurrentPage(1); // 검색 시 첫 페이지로 이동
    };
-
-   const minquiryDetailBtn = (event) => {
-      event.preventDefault();
-      window.location.href = '/minquirydetail';
+   
+   const minquiryDetailBtn = (idx) => {
+      window.location.href = `/minquirydetail/${idx}`;
    };
 
    const minquiryWriteBtn = (event) => {
@@ -92,7 +91,12 @@ function MinquiryList(props) {
    };
 
    if (loading) {
-      return <div>로딩 중...</div>;
+      return <div className={commons.lodding_page}>
+      <div>
+         <img src="/images/favicon192.png" alt="로고" />
+         <p>로딩 중...</p>
+      </div>
+   </div>;
    }
 
    return (
@@ -137,13 +141,13 @@ function MinquiryList(props) {
                         </thead>
                         <tbody>
                            {paginatedData.map((item, index) => (
-                              <tr key={item.counsel_idx || index} onClick={minquiryDetailBtn}>
+                              <tr key={item.counsel_idx || index} onClick={() => minquiryDetailBtn(item.counsel_idx)}>
                                  <td>{item.counsel_idx}</td>
                                  <td><p>{item.question_title}</p></td>
                                  <td>
                                     <div
                                        className={
-                                          item.qna_status === 1
+                                          item.counsel_open === 1
                                              ? styles.status_completed
                                              : styles.status_waiting
                                        }

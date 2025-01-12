@@ -10,8 +10,8 @@ function NoticeDetail(props) {
    const [post, setPost] = useState(null);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null); // 에러 상태 추가
-   const { noticeId } = useParams(); // URL에서 ID를 가져옴
-   const API_URL = `${process.env.REACT_APP_LOCAL_API_BASE_URL}/noticetbl/detail/${noticeId}`;
+   const { idx } = useParams(); // URL에서 ID를 가져옴
+   const API_URL = `${process.env.REACT_APP_LOCAL_API_BASE_URL}/noticetbl/detail/${idx}`;
    const navigate = useNavigate(); // useNavigate 훅 사용
    const titleInfo = titleMap['/noticedetail/:id']; // 동적 경로에 대한 타이틀 가져오기
 
@@ -86,7 +86,7 @@ function NoticeDetail(props) {
                </ul>
                <ul>
                   <li className={board.bodyCont}>
-                     {post.board_content || "게시글 내용이 없습니다."}
+                     {post.notice_content || "게시글 내용이 없습니다."}
                   </li>
                </ul>
                <ul>

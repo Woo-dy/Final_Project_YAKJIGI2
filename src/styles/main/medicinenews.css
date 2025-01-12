@@ -106,6 +106,24 @@
    word-break: keep-all;
 }
 
+.Medicinenews__img {
+   width: 100%; /* 원하는 너비 */
+   height: 230px; /* 원하는 높이 */
+   overflow: hidden; /* 이미지가 컨테이너를 넘지 않도록 숨김 */
+   position: relative; /* 자식 요소의 절대 위치를 위해 설정 */
+}
+
+.Medicinenews__img img {
+   width: 100%; /* 너비를 100%로 설정 */
+   height: 100%; /* 높이를 100%로 설정 */
+   object-fit: cover; /* 이미지가 컨테이너를 덮도록 설정 */
+   position: absolute; /* 절대 위치로 설정 */
+   top: 50%; /* 수직 중앙 정렬 */
+   left: 50%; /* 수평 중앙 정렬 */
+   transform: translate(-50%, -50%); /* 중앙 정렬을 위한 변환 */
+}
+
+
 .Medicinenews__title {
    width: 100%;
    max-width: 1320px;
@@ -119,6 +137,7 @@
    line-height: 80px;
    font-weight: 600;
    margin-bottom: 30px;
+   text-align: center;
 }
 
 .Medicinenews__title .main__description {
@@ -127,6 +146,7 @@
    color: #555555;
    word-break: keep-all;
    margin-bottom: 60px;
+   text-align: center;
 }
 
 

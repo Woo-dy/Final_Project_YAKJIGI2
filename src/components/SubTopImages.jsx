@@ -24,15 +24,20 @@ function SubTopImages(props) {
          return 'url(/images/sub/sub_bg_mybasic.jpg)'; // 모든 '/my'로 시작하는 페이지
       } else if (location.pathname.startsWith('/mypro')) {
          return 'url(/images/sub/sub_bg_mypro.jpg)'; // 모든 '/my'로 시작하는 페이지
-      } else if (noticegroupPaths.includes(location.pathname)) {
+      } else if (noticegroupPaths.includes(location.pathname) || location.pathname.startsWith('/noticedetail')) {
          if (idx) {
-             // idx가 있을 경우, 상세보기 페이지에 맞는 이미지
-             return 'url(/images/sub/sub_bg_4.jpg)'; // 상세보기 페이지에 맞는 이미지
+            return 'url(/images/sub/sub_bg_4.jpg)'; // 상세보기 페이지에 맞는 이미지
          }
          return 'url(/images/sub/sub_bg_4.jpg)'; // 모든 '/my'로 시작하는 페이지
-      } else if (minquirygroupPaths.includes(location.pathname)) {
+      } else if (minquirygroupPaths.includes(location.pathname) || location.pathname.startsWith('/minquirydetail')) {
+         if (idx) {
+            return 'url(/images/sub/sub_bg_4.jpg)'; // 상세보기 페이지에 맞는 이미지
+         }
          return 'url(/images/sub/sub_bg_4.jpg)'; // 모든 '/my'로 시작하는 페이지
-      } else if (qnagroupPaths.includes(location.pathname)) {
+      } else if (qnagroupPaths.includes(location.pathname) || location.pathname.startsWith('/qnadetail')) {
+         if (idx) {
+            return 'url(/images/sub/sub_bg_4.jpg)'; // 상세보기 페이지에 맞는 이미지
+         }
          return 'url(/images/sub/sub_bg_4.jpg)'; // 모든 '/my'로 시작하는 페이지
       } else if (accountgroupPaths.includes(location.pathname)) {
          return 'url(/images/sub/sub_bg_account.jpg)'; // 모든 '/my'로 시작하는 페이지

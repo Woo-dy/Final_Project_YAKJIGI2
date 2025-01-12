@@ -138,19 +138,19 @@ function App() {
                <Route path='/noticelist' element={<NoticeList />} />
                <Route path='/noticelistver1' element={<NoticeListVer1 />} />
                <Route path='/noticewrite' element={<NoticeWrite />} />
-               <Route path='/noticedetail/:noticeId' element={<NoticeDetail />} />
+               <Route path='/noticedetail/:idx' element={<NoticeDetail />} />
                <Route path='/noticeupdate' element={<NoticeUpdate />} />
 
                {/* 전문가와의 상담 게시판 */}
                <Route path='/qnalist' element={<QnaList />} />
                <Route path='/qnawrite' element={<QnaWrite />} />
-               <Route path='/qnadetail' element={<QnaDetail />} />
+               <Route path='/qnadetail/:idx' element={<QnaDetail />} />
                <Route path='/qnaupdate' element={<QnaUpdate />} />
 
                {/* 운영진에게 문의 게시판 */}
                <Route path='/minquirylist' element={<MinquiryList />} />
                <Route path='/minquirywrite' element={<MinquiryWrite />} />
-               <Route path='/minquirydetail' element={<MinquiryDetail />} />
+               <Route path='/minquirydetail/:idx' element={<MinquiryDetail />} />
                <Route path='/minquiryupdate' element={<MinquiryUpdate />} />
 
 

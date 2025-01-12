@@ -144,9 +144,9 @@ function Sub302(props) {
                      {/* 썸네일 이미지 */}
                      <div className={styles.Sub303__newtitle}>
                         <img
-                              src={getThumbnail(item.thumbnail)} // 썸네일이 없으면 기본 이미지 사용
-                              alt="썸네일"
-                              onClick={() => window.open(item.link, "_blank")}
+                           src={getThumbnail(item.thumbnail)} // 썸네일이 없으면 기본 이미지 사용
+                           alt="썸네일"
+                           onClick={() => window.open(item.link, "_blank")}
                         />
                      </div>
                      {/* 뉴스 내용 */}

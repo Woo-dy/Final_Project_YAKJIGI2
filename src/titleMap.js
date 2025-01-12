@@ -141,6 +141,9 @@ qnaboard.paths.forEach(path => {
    titleMap[path] = qnaboard.common;
 });
 
+// 동적 경로 처리
+titleMap['/qnadetail/:id'] = qnaboard.common; // 동적 경로에 대한 타이틀 추가
+
 // 운영진에게 문의 게시판
 const minquiryboard = {
    common: {
@@ -166,6 +169,9 @@ const minquiryboard = {
 minquiryboard.paths.forEach(path => {
    titleMap[path] = minquiryboard.common;
 });
+
+// 동적 경로 처리
+titleMap['/minquirydetail/:id'] = minquiryboard.common; // 동적 경로에 대한 타이틀 추가
 
 // 복약일지 게시판 basic
 const mybasicboard = {

@@ -84,9 +84,8 @@ function QnaList(props) {
       setCurrentPage(1); // 검색 시 첫 페이지로 이동
    };
 
-   const qnaDetailBtn = (event) => {
-      event.preventDefault();
-      window.location.href = '/qnadetail'; // 상세 페이지 이동
+   const qnaDetailBtn = (idx) => {
+      window.location.href = `/qnadetail/${idx}`;
    };
 
    const qnaWriteBtn = (event) => {
@@ -95,7 +94,12 @@ function QnaList(props) {
    };
 
    if (loading) {
-      return <div>로딩 중...</div>;
+      return <div className={commons.lodding_page}>
+      <div>
+         <img src="/images/favicon192.png" alt="로고" />
+         <p>로딩 중...</p>
+      </div>
+   </div>;
    }
 
    return (
@@ -317,18 +321,18 @@ function QnaList(props) {
                   </thead>
                   <tbody>
                      {paginatedData.map((item, index) => (
-                        <tr key={item.qna_idx || index} onClick={qnaDetailBtn}>
+                        <tr key={item.qna_idx || index} onClick={() => qnaDetailBtn(item.qna_idx)}>
                            <td>{item.qna_idx}</td>
                            <td><p>{item.qna_title}</p></td>
                            <td>
                               <div
                                  className={
-                                    item.qna_status === 1
+                                    item.qna_answer_stat === 1
                                        ? styles.qnalist__status_completed
                                        : styles.qnalist__status_waiting
                                  }
                               >
-                                 {item.qna_status === 1 ? '답변완료' : '답변대기'}
+                                 {item.qna_answer_stat === 1 ? '답변완료' : '답변대기'}
                               </div>
                            </td>
                            <td>{item.qna_q_reg_date}</td>
